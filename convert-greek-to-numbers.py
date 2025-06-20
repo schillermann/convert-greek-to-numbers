@@ -33,25 +33,43 @@ GREEK_NUMERAL_MAP = {
 }
 
 def greek_to_number(text):
-    total = 0
+    return sum(GREEK_NUMERAL_MAP.get(char, 0) for char in text)
+
+def letter_values(text):
+    result = []
     for char in text:
-        value = GREEK_NUMERAL_MAP.get(char)
-        if value:
-            total += value
-    return total
+        if char == ' ':
+            result.append((None, None))  # Insert blank line for space
+        else:
+            result.append((char, GREEK_NUMERAL_MAP.get(char, 0)))
+    return result
 
 def main():
     parser = argparse.ArgumentParser(description="Convert Greek letters in text to numeric values.")
     parser.add_argument("text", nargs="?", help="Greek text to convert")
+    parser.add_argument("--per-word", action="store_true", help="Show total numeric value of each word")
+    parser.add_argument("--per-letter", action="store_true", help="Show numeric value of each letter")
     args = parser.parse_args()
 
-    if args.text:
-        input_text = args.text
-    else:
-        input_text = input("Enter Greek text: ")
+    input_text = args.text if args.text else input("Enter Greek text: ")
 
-    total_value = greek_to_number(input_text)
-    print(f"Total numeric value: {total_value}")
+    if args.per_letter:
+        print("Letter values:")
+        for char, val in letter_values(input_text):
+            if char is None:
+                print()  # Print blank line for space
+            else:
+                print(f"{char}: {val}")
+
+    if args.per_word:
+        print("\nWord values:")
+        for word in input_text.split():
+            value = greek_to_number(word)
+            print(f"{word}: {value}")
+
+    if not args.per_word and not args.per_letter:
+        total_value = greek_to_number(input_text)
+        print(f"Total numeric value: {total_value}")
 
 if __name__ == "__main__":
     main()
